@@ -6,40 +6,31 @@
 	}	
 	BaP.init = function(callback) {		
 		loadStylesheet('http://localhost:85/BaPSDK/BaP.css');
-		loadScript('http://localhost:85/BaPSDK/sdk_lib.js', callback);
+		loadStylesheet('http://localhost:85/BaPSDK/jquery.datetimepicker.css');
+		loadScript('http://localhost:85/BaPSDK/jquery.js', function()
+		{
+			loadScript('http://localhost:85/BaPSDK/jquery.datetimepicker.full.js', function()
+			{
+				loadScript('http://localhost:85/BaPSDK/sdk_lib.js', callback);
+			});			
+		});		
 	};
-	function loadScript(path, callback) {
-		var done = false;
-		var scr = document.createElement('script');
-
-		scr.onload = handleLoad;
-		scr.onreadystatechange = handleReadyStateChange;
-		scr.onerror = handleError;
-		scr.src = path;
-		document.body.appendChild(scr);
-
-		function handleLoad() {
-			if (!done) {
-				done = true;
-				callback(path, "ok");
-			}
+	function loadScript(src, callback)
+	{
+	  var script, isReady;
+	  isReady = false;
+	  script = document.createElement('script');
+	  script.type = 'text/javascript';
+	  script.src = src;
+	  script.onload = script.onreadystatechange = function() {
+		//console.log( this.readyState ); //uncomment this line to see which ready states are called.
+		if ( !isReady && (!this.readyState || this.readyState == 'complete') )
+		{
+		  isReady = true;
+		  callback();
 		}
-		function handleReadyStateChange() {
-			var state;
-
-			if (!done) {
-				state = scr.readyState;
-				if (state === "complete") {
-					handleLoad();
-				}
-			}
-		}
-		function handleError() {
-			if (!done) {
-				done = true;
-				callback(path, "error");
-			}
-		}
+	  };
+	  document.body.appendChild(script);
 	}
 	function loadStylesheet(url) {
 		var link = document.createElement('link');
